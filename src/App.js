@@ -1,13 +1,22 @@
 import React, { Component } from 'react';
 import './App.css';
+
 import TodoList from './components/TodoList'
 import TodoForm from './components/TodoForm'
 import TodoSearch from './components/TodoSearch'
+import Login from './components/Login'
+
+var DB = require('./database.json');
 
 class App extends Component {
   constructor(props){
     super(props)
     this.state = {
+      userLogin: {
+        username: '',
+        password: '',
+      }, 
+      login: false,
       newForm: false,
       initialTodos: [],
       items: [],
@@ -45,6 +54,22 @@ class App extends Component {
       initialTodos: todos,
       items: todos
     })
+  }
+
+  handleLogin = (event) => {
+    event.preventDefault()
+    const userLogin = {...this.state.userLogin};
+    const userData = DB.filter((data) => {
+      return data.name === userLogin.username && data.password == userLogin.password
+    })
+    this.setState({login: userData.length > 0})
+  }
+
+  handleOnChange = (event) => {
+    const var1 = {
+      ...this.state.userLogin, [event.target.name]: event.target.value
+    }
+    this.setState({userLogin: {...var1} })
   }
 
   handleChange(newTodo){
@@ -107,6 +132,12 @@ class App extends Component {
     let { items, todo, newForm } = this.state;
     return (
       <div className="App">
+        <Login
+          userLogin={this.state.userLogin}
+          login={this.state.login}
+          handleOnChange={this.handleOnChange}
+          handleLogin={this.handleLogin}
+          />
         <TodoSearch
           searchTodo={this.searchTodo}
         />
